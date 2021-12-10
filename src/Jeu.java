@@ -15,10 +15,15 @@ public class Jeu {
 
     private IA j3;
 
+    /**
+     * Constructeur de la classe Jeu, il crée un attribut Random, et le plateau
+     */
     public Jeu(){
         random = new Random();
         plateau = new Plateau();
     }
+
+    /* ------------------------- Fonctions de gestion du jeu et des actions ---------------------------- */
 
     /**
      * Permet d'initialiser les différents éléments nécéssaires au lancement du jeu : Plateau, les équipes (rôles, + création des navires etc...)
@@ -37,10 +42,10 @@ public class Jeu {
     }
 
     /**
-     * Créé un tableau contenant les Types d'équipe trié de façon aléatoire.
-     * @return
+     * Permet de donner un ordre aléatoire au rôle des joueurs
+     * @return un tableau avec les rôles triés de façon aléatoire
      */
-    public StatutEquipe[] tirageAleatoireRole(){
+    private StatutEquipe[] tirageAleatoireRole(){
         StatutEquipe tableau[] = {null,null,null};
         int tirage = random.nextInt(100);
         if (tirage < 33){
@@ -103,6 +108,8 @@ public class Jeu {
         }
     }
 
+    /* ------------------------- Fonctions d'affichage ---------------------------- */
+
     /**
      * Gere l'affichage du menu d'accueil
      */
@@ -138,7 +145,6 @@ public class Jeu {
         affichageIntroTourDeJeu(j);
         tourDeJoueur(j);
     }
-
 
     public void tourDeJoueur(Joueur j){
         boolean finDeTour = false;
@@ -202,7 +208,7 @@ public class Jeu {
     }
 
     public boolean actionAttaquer(Joueur j, Navire navire){
-        ArrayList<Navire> listeNavireEnemieCote = plateau.navireEnemieACote(navire, j.id);
+        ArrayList<Navire> listeNavireEnemieCote = plateau.navireEnemieACote(navire);
         if (listeNavireEnemieCote.size() == 0){
             if (j.estHumain()) System.out.println("Aucun bateau a portee d'attaque du " + navire); //peut etre faire ça en exception
             return false;
@@ -369,6 +375,8 @@ public class Jeu {
         //INITIALISATION GLOBALE DU JEU
         Jeu jeu = new Jeu();
         jeu.initialisation();
+
+        //Initialisation des variables nécessaires au bon déroulement de la boucle principale du jeu
         boolean gagnant = false;
         Joueur tableauJoueur[] = {jeu.j1,jeu.j2,jeu.j3};
         int cpt = -1;
@@ -376,8 +384,6 @@ public class Jeu {
         //Placement Initial des navires
         jeu.affichageAccueil();
         jeu.placementNavireJoueursIA();
-
-        System.out.println(jeu.plateau);
 
         //debut de tour (deplacement ou attaquer)
         while (!gagnant){
