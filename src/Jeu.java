@@ -180,7 +180,7 @@ public class Jeu {
                 if (j.estHumain()){
                     affichageInformationBateau(navire);
                 }
-                if (!navire.actionJoue) {
+                if (!navire.getActionJouer()) {
                     if (j.estHumain()){
                         saisieIncorrecte = true;
                         while (saisieIncorrecte) {
@@ -276,15 +276,15 @@ public class Jeu {
         if (choix == 1){
             if (navire.statutNavire == StatutNavire.CHALUTIER){
                 actionPecher(j,navire);
-                navire.actionJoue = true;
+                navire.setActionJoue();
             } else {
-                navire.actionJoue = actionAttaquer(j,navire);
+                if (actionAttaquer(j,navire)) navire.setActionJoue();
             }
         } else if (choix == 2){
-            navire.actionJoue = actionSeDeplacer(j,navire);
+            if (actionSeDeplacer(j,navire)) navire.setActionJoue();;
         } else {
             navire.seReparer();
-            navire.actionJoue = true;
+            navire.setActionJoue();
         }
     }
 
@@ -344,7 +344,7 @@ public class Jeu {
         Position pos = plateau.getPosNavire(navire);
         System.out.println("\n============= " + navire + " =============");
         System.out.println(navire.stringStats() + "\nActuellement situé sur la case " + pos.x + "," + pos.y + "\n");
-        if (navire.actionJoue){
+        if (navire.getActionJouer()){
             System.out.println("Ce bateau a deja joue pendant ce tour. Veuillez en selectionner un autre.");
         } else {
             System.out.println("Quelle action voulez vous faire ? (Tapez 0 pour retourner au plateau de jeux)");

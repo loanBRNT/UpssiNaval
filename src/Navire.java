@@ -6,7 +6,7 @@ public abstract class Navire {
     protected int capaciteDeplacement;
     protected int degatAtt;
 
-    public boolean actionJoue;
+    private boolean actionJoue;
 
     public int idEquipe;
 
@@ -16,6 +16,28 @@ public abstract class Navire {
         capaciteDeplacement = 1; //Pour le moment, tous les bateaux se déplacent que d'une case
         idEquipe = _idEquipe;
         actionJoue = false;
+    }
+
+    /**
+     * Permet de remettre l'action a false pour le navire.
+     */
+    public void resetTour(){
+        actionJoue = false;
+    }
+
+    /**
+     * Permet de mettre l'action du bateau comme dejà effectué
+     */
+    public void setActionJoue(){
+        actionJoue = true;
+    }
+
+    /**
+     * Retourne si le navire a deja joue pendant ce tour
+     * @return true si oui, false sinon
+     */
+    public boolean getActionJouer(){
+        return actionJoue;
     }
 
     /**

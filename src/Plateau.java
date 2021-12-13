@@ -1,9 +1,8 @@
-import javax.swing.*;
 import java.util.ArrayList;
 
 public class Plateau {
-    public static final int LARGEUR_PLATEAU = 10;
-    public static final int LONGUEUR_PLATEAU = 10;
+    public static final int LARGEUR_PLATEAU = 5;
+    public static final int LONGUEUR_PLATEAU = 5;
 
     private Case grille[][];
 

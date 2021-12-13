@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public abstract class Equipe implements IEquipe{
     protected StatutEquipe statut;
@@ -10,15 +9,40 @@ public abstract class Equipe implements IEquipe{
         listeNavire = new ArrayList<>();
     }
 
+    /**
+     * Ajoute un navire a la liste de l'équipe
+     * @param n le navire a ajouté
+     */
     public void ajoutNavire(Navire n){
         listeNavire.add(n);
     }
 
+    /**
+     * Initialise les navires de la liste afin de commencer le tour.
+     */
+    public void initTour(){
+        for (int i = 0 ; i < listeNavire.size() ; i++){
+            listeNavire.get(i).resetTour();
+        }
+    }
+
+    /**
+     * Supprime un navire de la liste de l'équipe.
+     * @param navire le navire a supprimer
+     */
+    public void supprimerNavire(Navire navire){
+        listeNavire.remove(navire);
+    }
 
     @Override
+    /**
+     * Retourne le statut de l'équipe : Bataillon ou Pecheur
+     */
     public StatutEquipe getStatut() {
         return statut;
     }
+
+    /* ----------- FONCTION STRING --------------- */
 
     @Override
     public String toString(){
@@ -31,15 +55,5 @@ public abstract class Equipe implements IEquipe{
             s = s + i + ": " + listeNavire.get(i-1) + "\n";
         }
         return s;
-    }
-
-    public void initTour(){
-        for (int i = 0 ; i < listeNavire.size() ; i++){
-            listeNavire.get(i).actionJoue = false;
-        }
-    }
-
-    public void supprimerNavire(Navire navire){
-        listeNavire.remove(navire);
     }
 }

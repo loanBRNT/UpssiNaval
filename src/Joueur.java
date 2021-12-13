@@ -18,7 +18,7 @@ public abstract class Joueur {
     public boolean tourFinis(){
         boolean toutLesBateauxOntJoue = true;
         for (int i = 0 ; i < equipe.listeNavire.size() ; i++){
-            if (!equipe.listeNavire.get(i).actionJoue){
+            if (!equipe.listeNavire.get(i).getActionJouer()){
                 toutLesBateauxOntJoue = false;
             }
         }
