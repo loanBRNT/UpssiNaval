@@ -7,7 +7,7 @@ public class Pecheur extends Equipe{
 
     @Override
     public void initEquipe(int idEquipe) {
-        for (int i = 0 ; i < 3 ; i++){
+        for (int i = 0 ; i < 5 ; i++){
             this.ajoutNavire(new Chalutier(idEquipe));
         }
     }

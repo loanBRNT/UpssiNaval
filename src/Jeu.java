@@ -1,5 +1,3 @@
-import org.jetbrains.annotations.NotNull;
-
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
@@ -81,9 +79,9 @@ public class Jeu {
      * Permet à l'IA de placer ces bateaux
      */
     public void placementNavireIA(){
-        for (int i = 0 ; i < 3 ; i++){ //Pour chaque bateau, ici la rep fixe a 3 pour les tests
+        for (int i = 0 ; i < 5 ; i++){
             try {
-                plateau.getCase(j3.placementNavire(i,plateau.LARGEUR_PLATEAU,plateau.LONGUEUR_PLATEAU)).setNavire(j3.equipe.listeNavire.get(i));
+                plateau.getCase(j3.placementNavire(i,plateau.LARGEUR_PLATEAU,plateau.LONGUEUR_PLATEAU)).setNavire(j3.getNavireAvecRang(i));
             } catch (Exception e) {
                 i--;
             }
@@ -96,10 +94,10 @@ public class Jeu {
      * @param j
      */
     public void placementNavireJoueur(JHumain j){
-        for (int i = 0 ; i < 3 ; i++){ //Pour chaque bateau, ici la rep fixe a 3 pour les tests
+        for (int i = 0 ; i < 5 ; i++){
             System.out.println(plateau);
             try {
-                plateau.getCase(j.placementNavire(i)).setNavire(j.equipe.listeNavire.get(i));
+                plateau.getCase(j.placementNavire(i)).setNavire(j.getNavireAvecRang(i));
             } catch (Exception e) {
                 e.printStackTrace();
                 i--;
@@ -108,58 +106,40 @@ public class Jeu {
         }
     }
 
-    /* ------------------------- Fonctions d'affichage ---------------------------- */
-
     /**
-     * Gere l'affichage du menu d'accueil
+     * Initialie le tour du Joueur avant de le lancer
+     * @param j
      */
-    public void affichageAccueil(){
-        Scanner sc = new Scanner(System.in);
-        System.out.println("\n--------------- BIENVENUE DANS UPSSINAVAL (1.00) -----------------\nPour un affichage optimal, nous recommandons, de mettre cet console en plein écran\n");
-        System.out.println("Le joueur 1 joue l'" + j1 + "\nLe joueur 2 joue l'" + j2 + "\nL'IA joue l'" + j3);
-        System.out.println("\nLes Dimensions du Plateau de jeu sont de " + plateau.LARGEUR_PLATEAU + "X" + plateau.LONGUEUR_PLATEAU);
-        System.out.println("\n                                   [PRESS A KEY AND ENTER FOR NEXT]");
-        System.out.println("-------------------------------------------------------------------");
-        sc.next();
-    }
-
-    /**
-     * Permet d'afficher les consignes de saisies
-     * @param x (num du joueur)
-     */
-    public void affichagePlacementNavire(int x){
-        System.out.println("-------------------- Placement bateaux J" + x + " -------------------------");
-        System.out.println("Veuillez suivre la procédure suivante :\nTapez numéro de ligne et numéro de colonne a la suite du nom de bateau\n(Commence à 0)");
-    }
-
-    /**
-     * Affiche la phrase de placement des navires par l'IA.
-     */
-    public void affichagePlacementNavireIA(){
-        System.out.println("-------------------- Placement bateaux IA -------------------------");
-        System.out.println("L'ordinateur est en train de placer ses bateaux...");
-    }
-
     public void lancementTourDeJeuJoueur(Joueur j){
         j.equipe.initTour();
         affichageIntroTourDeJeu(j);
         tourDeJoueur(j);
     }
 
+    /**
+     * La fonction principale du tour de jeu d'un joueur
+     * @param j Le joueur dont c'est le tour
+     */
     public void tourDeJoueur(Joueur j){
         boolean finDeTour = false;
         Scanner sc = new Scanner(System.in);
         int choix=0;
         boolean saisieIncorrecte;
+
+
         do {
+            //on teste la fin de tour automatique
             if (j.tourFinis()) {
                 finDeTour = true;
                 continue;
             }
+
+            //On recup ici le bateau qu'il veut jouer (grace à son rang+1). S'il tape 0, c'est la fin de tour prématuré
             if (j.estHumain()){
                 affichagePrincipalTourDeJeu(j);
                 choix = 0;
                 saisieIncorrecte = true;
+
                 while (saisieIncorrecte) {
                     saisieIncorrecte = false;
                     try {
@@ -170,16 +150,21 @@ public class Jeu {
                         e.printStackTrace();
                     }
                 }
+
             } else {
                 choix++;
                 if (choix > j.equipe.listeNavire.size()) choix = 1;
             }
+
+            //On regarde l'action qu'il veut faire avec son bateau
 
             if (choix != 0) {
                 Navire navire = j.equipe.listeNavire.get(choix - 1);
                 if (j.estHumain()){
                     affichageInformationBateau(navire);
                 }
+
+                //S'il n'a pas joué, on lui propose une liste d'action et il choisit
                 if (!navire.getActionJouer()) {
                     if (j.estHumain()){
                         saisieIncorrecte = true;
@@ -196,9 +181,11 @@ public class Jeu {
                     } else {
                         choix = random.nextInt(3) + 1;
                     }
+
                     if (choix != 0) {
                         lancerAction(j, navire, choix);;
                     }
+
                 }
             } else {
                 finDeTour = true;
@@ -244,13 +231,6 @@ public class Jeu {
         else j=j3;
         j.equipe.supprimerNavire(navire);
         System.out.println(j.equipe.listeNavire);
-    }
-
-    public void affichageAttaque(ArrayList<Navire> listeNavire){
-        System.out.println("Les navires a portée d'attaque sont :");
-        for (int i = 0 ; i < listeNavire.size() ; i++){
-            System.out.println( i+1 + ": " + listeNavire.get(i).stringStatsCible() + " " + plateau.stringCoordonee(listeNavire.get(i)));
-        }
     }
 
     public void actionPecher(Joueur j, Navire navire) { //FAIRE ACTION PECHER
@@ -316,11 +296,72 @@ public class Jeu {
         return true;
     }
 
+    public boolean testGagnant(Joueur[] tab , int x){
+        boolean toutesLesAutreFlotteDetruit = true;
+        for (int i = 0 ; i < 3 ; i++){
+            if ((i != x) && (tab[i].equipe.listeNavire.size() != 0)){
+                toutesLesAutreFlotteDetruit = false;
+            }
+        }
+        return toutesLesAutreFlotteDetruit;
+    }
+
+    /* ------------------------- Fonctions d'affichage ---------------------------- */
+
+    /**
+     * Gere l'affichage du menu d'accueil
+     */
+    public void affichageAccueil(){
+        Scanner sc = new Scanner(System.in);
+        System.out.println("\n--------------- BIENVENUE DANS UPSSINAVAL (1.00) -----------------\nPour un affichage optimal, nous recommandons, de mettre cet console en plein écran\n");
+        System.out.println("Le joueur 1 joue l'" + j1 + "\nLe joueur 2 joue l'" + j2 + "\nL'IA joue l'" + j3);
+        System.out.println("\nLes Dimensions du Plateau de jeu sont de " + plateau.LARGEUR_PLATEAU + "X" + plateau.LONGUEUR_PLATEAU);
+        System.out.println("\n                                   [PRESS A KEY AND ENTER FOR NEXT]");
+        System.out.println("-------------------------------------------------------------------");
+        sc.next();
+    }
+
+    /**
+     * Permet d'afficher les consignes de saisies
+     * @param x (num du joueur)
+     */
+    public void affichagePlacementNavire(int x){
+        System.out.println("-------------------- Placement bateaux J" + x + " -------------------------");
+        System.out.println("Veuillez suivre la procédure suivante :\nTapez numéro de ligne et numéro de colonne a la suite du nom de bateau\n(Commence à 0)");
+    }
+
+    /**
+     * Affiche la phrase de placement des navires par l'IA.
+     */
+    public void affichagePlacementNavireIA(){
+        System.out.println("-------------------- Placement bateaux IA -------------------------");
+        System.out.println("L'ordinateur est en train de placer ses bateaux...");
+    }
+
+    /**
+     * Affiche la liste des navires a portee de l'attaque du navire
+     * @param listeNavire la liste des navires a portee
+     */
+    public void affichageAttaque(ArrayList<Navire> listeNavire){
+        System.out.println("Les navires a portée d'attaque sont :");
+        for (int i = 0 ; i < listeNavire.size() ; i++){
+            System.out.println( i+1 + ": " + listeNavire.get(i).stringStatsCible() + " " + plateau.stringCoordonee(listeNavire.get(i)));
+        }
+    }
+
+    /**
+     * Affiche la fin de tour
+     * @param j le joueur dont le tour est terminé
+     */
     public void affichageFinDeTour(Joueur j){
         System.out.println("Fin du tour du J" + j.id);
         System.out.println("-----------------------");
     }
 
+    /**
+     * Affiche l'introduction du tour de jeu selon si c'est un humain ou un IA
+     * @param j le joueur dont le tour commence
+     */
     public void affichageIntroTourDeJeu(Joueur j){
         System.out.println("\n-------------------- C'est au tour du J" + j.id + " -------------------------");
         if (j.estHumain()) {
@@ -333,6 +374,10 @@ public class Jeu {
 
     }
 
+    /**
+     * Affichage du plateau de jeu et la liste des navires du joueur dont c'est le tour
+     * @param j le joueur en question
+     */
     public void affichagePrincipalTourDeJeu(Joueur j){
         System.out.println(plateau);
         System.out.println("=================");
@@ -340,6 +385,10 @@ public class Jeu {
         System.out.println("=================");
     }
 
+    /**
+     * Affiche les informations du navire + la liste de ces actions disponibles
+     * @param navire le navire dont on veut afficher les informations
+     */
     public void affichageInformationBateau(Navire navire){
         Position pos = plateau.getPosNavire(navire);
         System.out.println("\n============= " + navire + " =============");
@@ -353,21 +402,16 @@ public class Jeu {
 
     }
 
+    /**
+     * Permet d'afficher soit l'action pêcher, soit attaquer
+     * @param navire le navire dont on veut afficher l'action
+     * @return "Pêcher" ou "Attaquer un navire"
+     */
     public String stringAffichageAttaquerOuPecher(Navire navire){
         if (navire.statutNavire == StatutNavire.CHALUTIER){
             return "Pêcher";
         }
         return "Attaquer un navire";
-    }
-
-    public boolean testGagnant(Joueur[] tab , int x){
-        boolean toutesLesAutreFlotteDetruit = true;
-        for (int i = 0 ; i < 3 ; i++){
-            if ((i != x) && (tab[i].equipe.listeNavire.size() != 0)){
-                toutesLesAutreFlotteDetruit = false;
-            }
-        }
-        return toutesLesAutreFlotteDetruit;
     }
 
     public static void main(String[] args) {
@@ -395,8 +439,3 @@ public class Jeu {
         System.out.println("LE GAGNANT EST : J"+ tableauJoueur[cpt].id);
     }
 }
-
-/*
-METTRE LES ATTRIBUTS IMPORTANT EN PRIVATE
-EVITER LES . . . , utilsier une sous fonction
- */

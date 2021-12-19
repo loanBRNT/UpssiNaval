@@ -1,6 +1,5 @@
 public abstract class Joueur {
-    public Equipe equipe;
-
+    protected Equipe equipe;
     public int id;
 
     public Joueur(StatutEquipe st, int idEquipe){
@@ -15,6 +14,10 @@ public abstract class Joueur {
         return equipe.toString();
     }
 
+    /**
+     * Permet de détecter si tous les bateaux du joueur ont joués.
+     * @return true si oui, false sinon
+     */
     public boolean tourFinis(){
         boolean toutLesBateauxOntJoue = true;
         for (int i = 0 ; i < equipe.listeNavire.size() ; i++){
@@ -25,7 +28,21 @@ public abstract class Joueur {
         return toutLesBateauxOntJoue;
     }
 
+    /**
+     * Permet de savoir si le joueur est humain
+     * @return true si oui, false sinon
+     */
     public boolean estHumain(){
         return this.getClass() == JHumain.class;
     }
+
+    /**
+     * Renvoie le navire au rang i de la flotte du joueur
+     * @param i le rang
+     * @return le navire
+     */
+    public Navire getNavireAvecRang(int i){
+        return equipe.getNavireAvecRang(i);
+    }
+
 }

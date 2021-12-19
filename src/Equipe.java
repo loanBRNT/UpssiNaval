@@ -10,6 +10,15 @@ public abstract class Equipe implements IEquipe{
     }
 
     /**
+     * Renvoie le navire au rang i de la flotte du joueur
+     * @param i le rang
+     * @return le navire
+     */
+    public Navire getNavireAvecRang(int i){
+        return listeNavire.get(i);
+    }
+
+    /**
      * Ajoute un navire a la liste de l'équipe
      * @param n le navire a ajouté
      */
