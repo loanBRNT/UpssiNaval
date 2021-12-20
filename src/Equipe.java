@@ -55,7 +55,7 @@ public abstract class Equipe implements IEquipe{
 
     @Override
     public String toString(){
-        return "Equipe " + statut + " | Sa flote est composée de : " + listeNavire;
+        return "Equipe " + statut + " | Sa flotte est composée de : " + listeNavire;
     }
 
     public String stringListeNavire(){

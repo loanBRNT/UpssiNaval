@@ -194,11 +194,16 @@ public class Jeu {
         } while (!finDeTour);
     }
 
-    public boolean actionAttaquer(Joueur j, Navire navire){
+    /**
+     * Permet à un joueur de choisir quel navire attaquer à partir de son navire
+     * @param j le jouueur dont c'est le tour
+     * @param navire le navire du joueur
+     * @throws IllegalActionException
+     */
+    public void actionAttaquer(Joueur j, Navire navire) throws IllegalActionException {
         ArrayList<Navire> listeNavireEnemieCote = plateau.navireEnemieACote(navire);
         if (listeNavireEnemieCote.size() == 0){
-            if (j.estHumain()) System.out.println("Aucun bateau a portee d'attaque du " + navire); //peut etre faire ça en exception
-            return false;
+            throw new IllegalActionException("Aucun bateau a portee d'attaque du " + navire);
         }
         Scanner sc = new Scanner(System.in);
         Navire nCible;
@@ -220,9 +225,12 @@ public class Jeu {
                 erreur = true;
             }
         } while (erreur);
-        return true;
     }
 
+    /**
+     * Permet de mettre à jour les différents éléments du jeu lorsqu'un navire est détruit
+     * @param navire le navire détruit
+     */
     public void majJeuNavireDetruit(Navire navire){
         plateau.supprimerNavire(navire);
         Joueur j;
@@ -230,14 +238,18 @@ public class Jeu {
         else if (navire.idEquipe == 2) j=j2;
         else j=j3;
         j.equipe.supprimerNavire(navire);
-        System.out.println(j.equipe.listeNavire);
     }
 
-    public void actionPecher(Joueur j, Navire navire) { //FAIRE ACTION PECHER
-        if (j.estHumain()) System.out.println("Le bateau lance les filets...");
+    /**
+     * Permet à un navire de pêcher
+     * @param j le joueur dont c'est le tour
+     * @param navire le navire en question
+     */
+    public void actionPecher(Joueur j, Navire navire) {
+        System.out.println("Le " + navire + " lance les filets...");
         if (plateau.getCase(navire).isOccupeProfondeur()){
             Navire nCible = plateau.getCase(navire).getOccupantProfondeur();
-            if (j.estHumain()) System.out.println("ça Mord !\n"+ "Vous avez pris possesion du " + nCible);
+            if (j.estHumain()) System.out.println("ça Mord !\n"+ "Le Joueur " + j.id + " prend possesion du " + nCible);
             j.equipe.listeNavire.add(nCible);
             if (nCible.idEquipe == 1){
                 j1.equipe.supprimerNavire(nCible);
@@ -248,34 +260,49 @@ public class Jeu {
             }
             nCible.idEquipe = navire.idEquipe;
         } else {
-            if (j.estHumain()) System.out.println("...il n'y a rien ici");
+            System.out.println("...il n'y a rien ici");
         }
     }
 
+    /**
+     * Lance l'action du navire selon choix
+     * @param j le joueur dont c'est le tour
+     * @param navire le navire à partir duquel on veut faire l'action
+     * @param choix le numéro de l'action
+     */
     public void lancerAction(Joueur j,Navire navire, int choix){
-        if (choix == 1){
-            if (navire.statutNavire == StatutNavire.CHALUTIER){
-                actionPecher(j,navire);
-                navire.setActionJoue();
+        try {
+            if (choix == 1){
+                if (navire.statutNavire == StatutNavire.CHALUTIER){
+                    actionPecher(j,navire);
+                    navire.setActionJoue();
+                } else {
+                    actionAttaquer(j,navire);
+                }
+            } else if (choix == 2){
+                actionSeDeplacer(j,navire);
             } else {
-                if (actionAttaquer(j,navire)) navire.setActionJoue();
+                navire.seReparer();
             }
-        } else if (choix == 2){
-            if (actionSeDeplacer(j,navire)) navire.setActionJoue();;
-        } else {
-            navire.seReparer();
             navire.setActionJoue();
+        } catch (IllegalActionException e){
+            if (j.estHumain()) e.printStackTrace();
         }
     }
 
-    public boolean actionSeDeplacer(Joueur j, Navire navire){
+    /**
+     * Permet à un navire de se déplacer
+     * @param j le joueur dont c'est le tour
+     * @param navire le navire en question
+     * @throws IllegalActionException
+     */
+    public void actionSeDeplacer(Joueur j, Navire navire) throws IllegalActionException {
         ArrayList<Position> listePosCase = plateau.PositionCaseDisponibleAutour(navire);
         int choix;
+        if (listePosCase.size() == 0) {
+            throw new IllegalActionException("Aucun deplacement possible pour " + navire);
+        }
         if (j.estHumain()){
-            if (listePosCase.size() == 0) {
-                System.out.println("Aucun deplacement possible pour " + navire);
-                return false;
-            }
             Scanner sc = new Scanner(System.in);
             boolean erreur;
             do {
@@ -293,9 +320,14 @@ public class Jeu {
         } else {
             plateau.deplacerNavireSurCase(navire,listePosCase.get(random.nextInt(listePosCase.size())));
         }
-        return true;
     }
 
+    /**
+     * Détermine si le joueur dont c'est le tour gagne la partie à l'issu de son tour
+     * @param tab Le tableau des joueurs
+     * @param x le rang du joueur dont c'était le tour
+     * @return true s'il gagne, false sinon
+     */
     public boolean testGagnant(Joueur[] tab , int x){
         boolean toutesLesAutreFlotteDetruit = true;
         for (int i = 0 ; i < 3 ; i++){
@@ -313,7 +345,7 @@ public class Jeu {
      */
     public void affichageAccueil(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("\n--------------- BIENVENUE DANS UPSSINAVAL (1.00) -----------------\nPour un affichage optimal, nous recommandons, de mettre cet console en plein écran\n");
+        System.out.println("\n--------------- BIENVENUE DANS UPSSINAVAL (1.00) -----------------\nPour un affichage optimal, nous recommandons, de mettre la console en plein écran\n");
         System.out.println("Le joueur 1 joue l'" + j1 + "\nLe joueur 2 joue l'" + j2 + "\nL'IA joue l'" + j3);
         System.out.println("\nLes Dimensions du Plateau de jeu sont de " + plateau.LARGEUR_PLATEAU + "X" + plateau.LONGUEUR_PLATEAU);
         System.out.println("\n                                   [PRESS A KEY AND ENTER FOR NEXT]");
