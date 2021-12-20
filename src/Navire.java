@@ -48,7 +48,7 @@ public abstract class Navire {
         if ( PV > PVmax) {
             PV = PVmax;
         }
-        System.out.print("Le " + this + " est en train de se reparer. Il a maintenant : " + PV + "PV");
+        System.out.println("Le " + this + " est en train de se reparer. Il a maintenant : " + PV + "PV");
     }
 
      /**

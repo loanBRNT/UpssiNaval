@@ -45,4 +45,5 @@ public abstract class Joueur {
         return equipe.getNavireAvecRang(i);
     }
 
+    public abstract int choixValeur(int borneMoins, int borneSup);
 }

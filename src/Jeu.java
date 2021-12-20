@@ -137,21 +137,9 @@ public class Jeu {
             //On recup ici le bateau qu'il veut jouer (grace à son rang+1). S'il tape 0, c'est la fin de tour prématuré
             if (j.estHumain()){
                 affichagePrincipalTourDeJeu(j);
-                choix = 0;
-                saisieIncorrecte = true;
-
-                while (saisieIncorrecte) {
-                    saisieIncorrecte = false;
-                    try {
-                        choix = Integer.parseInt(sc.next()); //le next.int() me bouclait une erreur en permanance en cas de mauvaise saisie.
-                        if (choix < 0 || choix > j.equipe.listeNavire.size()) saisieIncorrecte = true;
-                    } catch (Exception e) {
-                        saisieIncorrecte = true;
-                        e.printStackTrace();
-                    }
-                }
-
+                choix = j.choixValeur(0,j.equipe.listeNavire.size());
             } else {
+                //on fait cette manipulation pour s'assurer que l'IA joue tous ses bateaux
                 choix++;
                 if (choix > j.equipe.listeNavire.size()) choix = 1;
             }
@@ -166,21 +154,7 @@ public class Jeu {
 
                 //S'il n'a pas joué, on lui propose une liste d'action et il choisit
                 if (!navire.getActionJouer()) {
-                    if (j.estHumain()){
-                        saisieIncorrecte = true;
-                        while (saisieIncorrecte) {
-                            saisieIncorrecte = false;
-                            try {
-                                choix = Integer.parseInt(sc.next());
-                                if (choix < 0 || choix > 3) saisieIncorrecte = true;
-                            } catch (Exception e) {
-                                saisieIncorrecte = true;
-                                e.printStackTrace();
-                            }
-                        }
-                    } else {
-                        choix = random.nextInt(3) + 1;
-                    }
+                    choix = j.choixValeur(0,3);
 
                     if (choix != 0) {
                         lancerAction(j, navire, choix);;
@@ -205,15 +179,13 @@ public class Jeu {
         if (listeNavireEnemieCote.size() == 0){
             throw new IllegalActionException("Aucun bateau a portee d'attaque du " + navire);
         }
-        Scanner sc = new Scanner(System.in);
         Navire nCible;
         int choix;
         boolean erreur;
         do {
             if (j.estHumain()) affichageAttaque(listeNavireEnemieCote);
             try {
-                if (j.estHumain()) choix = Integer.parseInt(sc.next());
-                else choix = random.nextInt(listeNavireEnemieCote.size())+1;
+                choix = j.choixValeur(1,listeNavireEnemieCote.size());
                 nCible = listeNavireEnemieCote.get(choix-1);
                 navire.attaque(nCible);
                 if (nCible.PV <= 0){
@@ -249,7 +221,7 @@ public class Jeu {
         System.out.println("Le " + navire + " lance les filets...");
         if (plateau.getCase(navire).isOccupeProfondeur()){
             Navire nCible = plateau.getCase(navire).getOccupantProfondeur();
-            if (j.estHumain()) System.out.println("ça Mord !\n"+ "Le Joueur " + j.id + " prend possesion du " + nCible);
+            System.out.println("ça Mord !\n"+ "Le Joueur " + j.id + " prend possesion du " + nCible);
             j.equipe.listeNavire.add(nCible);
             if (nCible.idEquipe == 1){
                 j1.equipe.supprimerNavire(nCible);
@@ -302,24 +274,21 @@ public class Jeu {
         if (listePosCase.size() == 0) {
             throw new IllegalActionException("Aucun deplacement possible pour " + navire);
         }
-        if (j.estHumain()){
-            Scanner sc = new Scanner(System.in);
-            boolean erreur;
-            do {
+        boolean erreur;
+        do {
+            if (j.estHumain()){
                 System.out.println("Les cases libres pour se deplacer sont :");
                 System.out.println(plateau.stringCaseDisponibleAutour(listePosCase));
-                try {
-                    choix = Integer.parseInt(sc.next());
-                    plateau.deplacerNavireSurCase(navire,listePosCase.get(choix-1));
-                    erreur = false;
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    erreur = true;
-                }
-            } while (erreur);
-        } else {
-            plateau.deplacerNavireSurCase(navire,listePosCase.get(random.nextInt(listePosCase.size())));
-        }
+            }
+            try {
+                choix = j.choixValeur(1,listePosCase.size());
+                plateau.deplacerNavireSurCase(navire,listePosCase.get(choix-1));
+                erreur = false;
+            } catch (Exception e) {
+                e.printStackTrace();
+                erreur = true;
+            }
+        } while (erreur);
     }
 
     /**
