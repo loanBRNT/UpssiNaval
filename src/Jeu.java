@@ -1,11 +1,17 @@
+import Flotte.*;
+import Statut.*;
+import Support.*;
+import Team.*;
+import Exception.*;
+
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Jeu {
-    private Random random;
+    private final Random random;
 
-    private Plateau plateau;
+    private final Plateau plateau;
 
     private JHumain j1;
 
@@ -24,14 +30,14 @@ public class Jeu {
     /* ------------------------- Fonctions de gestion du jeu et des actions ---------------------------- */
 
     /**
-     * Permet d'initialiser les différents éléments nécéssaires au lancement du jeu : Plateau, les équipes (rôles, + création des navires etc...)
+     * Permet d'initialiser les différents éléments nécéssaires au lancement du jeu : Support.Plateau, les équipes (rôles, + création des navires etc...)
      */
     public void initialisation(){
 
         plateau.initialisationPlateau();
 
         //CREATION D'UN TABLEAU POUR ATTRIBUER ALEATOIREMENT LES ROLES AUX JOUEURS
-        StatutEquipe tableau[] = tirageAleatoireRole();
+        StatutEquipe[] tableau = tirageAleatoireRole();
 
         //INITIALISATION DES Joueurs & EQUIPES
         j1 = new JHumain(tableau[0],1);
@@ -44,7 +50,7 @@ public class Jeu {
      * @return un tableau avec les rôles triés de façon aléatoire
      */
     private StatutEquipe[] tirageAleatoireRole(){
-        StatutEquipe tableau[] = {null,null,null};
+        StatutEquipe[] tableau = {null,null,null};
         int tirage = random.nextInt(100);
         if (tirage < 33){
             tableau[0] = StatutEquipe.PECHEUR;
@@ -63,8 +69,8 @@ public class Jeu {
     }
 
     /**
-     * Fonction appelant les fonctions réalisant le placement des navires pour les joueurs et l'IA.
-     * L'IA joue en premier pour éviter qu'elle donne des cases déjà occupés
+     * Fonction appelant les fonctions réalisant le placement des navires pour les joueurs et l'Team.IA.
+     * L'Team.IA joue en premier pour éviter qu'elle donne des cases déjà occupés
      */
     public void placementNavireGen(Joueur[] tab){
         for (int i = 2 ; i >= 0 ; i--){
@@ -81,7 +87,7 @@ public class Jeu {
         for (int i = 0 ; i < 5 ; i++){
             if (j.estHumain()) System.out.println(plateau);
             try {
-                plateau.getCase(j.placementNavire(i,plateau.LARGEUR_PLATEAU,plateau.LONGUEUR_PLATEAU)).setNavire(j.getNavireAvecRang(i));
+                plateau.getCase(j.placementNavire(i, Plateau.LARGEUR_PLATEAU, Plateau.LONGUEUR_PLATEAU)).setNavire(j.getNavireAvecRang(i));
             } catch (Exception e) {
                 if (j.estHumain()) e.printStackTrace();
                 i--;
@@ -90,7 +96,7 @@ public class Jeu {
     }
 
     /**
-     * Initialie le tour du Joueur avant de le lancer
+     * Initialie le tour du Team.Joueur avant de le lancer
      * @param j
      */
     public void lancementTourDeJeuJoueur(Joueur j){
@@ -122,7 +128,7 @@ public class Jeu {
                 affichagePrincipalTourDeJeu(j);
                 choix = j.choixValeur(0,j.equipe.listeNavire.size());
             } else {
-                //on fait cette manipulation pour s'assurer que l'IA joue tous ses bateaux
+                //on fait cette manipulation pour s'assurer que l'Team.IA joue tous ses bateaux
                 choix++;
                 if (choix > j.equipe.listeNavire.size()) choix = 1;
             }
@@ -204,7 +210,7 @@ public class Jeu {
         System.out.println("Le " + navire + " lance les filets...");
         if (plateau.getCase(navire).isOccupeProfondeur()){
             Navire nCible = plateau.getCase(navire).getOccupantProfondeur();
-            System.out.println("ça Mord !\n"+ "Le Joueur " + j.id + " prend possesion du " + nCible);
+            System.out.println("ça Mord !\n"+ "Le Team.Joueur " + j.id + " prend possesion du " + nCible);
             j.equipe.listeNavire.add(nCible);
             if (nCible.idEquipe == 1){
                 j1.equipe.supprimerNavire(nCible);
@@ -299,7 +305,7 @@ public class Jeu {
         Scanner sc = new Scanner(System.in);
         System.out.println("\n--------------- BIENVENUE DANS UPSSINAVAL (1.00) -----------------\nPour un affichage optimal, nous recommandons, de mettre la console en plein écran\n");
         System.out.println("Le joueur 1 joue l'" + j1 + "\nLe joueur 2 joue l'" + j2 + "\nL'IA joue l'" + j3);
-        System.out.println("\nLes Dimensions du Plateau de jeu sont de " + plateau.LARGEUR_PLATEAU + "X" + plateau.LONGUEUR_PLATEAU);
+        System.out.println("\nLes Dimensions du Plateau de jeu sont de " + Plateau.LARGEUR_PLATEAU + "X" + Plateau.LONGUEUR_PLATEAU);
         System.out.println("\n                                   [PRESS A KEY AND ENTER FOR NEXT]");
         System.out.println("-------------------------------------------------------------------");
         sc.next();
@@ -341,15 +347,16 @@ public class Jeu {
     }
 
     /**
-     * Affiche l'introduction du tour de jeu selon si c'est un humain ou un IA
+     * Affiche l'introduction du tour de jeu selon si c'est un humain ou un Team.IA
      * @param j le joueur dont le tour commence
      */
     public void affichageIntroTourDeJeu(Joueur j){
         System.out.println("\n-------------------- C'est au tour du J" + j.id + " -------------------------");
         if (j.estHumain()) {
-            System.out.println("Pour chacun de vos navires vous pouvez choisir entre 3 actions : Attaquer, Deplacer, Reparer\n" +
-                    "Tapez le numero correspondant à un bateau pour entrer dans son menu d'action.\n" +
-                    "Tapez 0 puis Entree pour finir votre tour");
+            System.out.println("""
+                    Pour chacun de vos navires vous pouvez choisir entre 3 actions : Attaquer, Deplacer, Reparer
+                    Tapez le numero correspondant à un bateau pour entrer dans son menu d'action.
+                    Tapez 0 puis Entree pour finir votre tour""");
         } else {
             System.out.println("L'IA joue ses coups...");
         }
@@ -404,7 +411,7 @@ public class Jeu {
 
         //Initialisation des variables nécessaires au bon déroulement de la boucle principale du jeu
         boolean gagnant = false;
-        Joueur tableauJoueur[] = {jeu.j1,jeu.j2,jeu.j3};
+        Joueur[] tableauJoueur = {jeu.j1,jeu.j2,jeu.j3};
         int cpt = -1;
 
         //Placement Initial des navires
@@ -414,7 +421,7 @@ public class Jeu {
         //debut de tour (deplacement ou attaquer)
         while (!gagnant){
             cpt = (cpt + 1) % 3;
-            jeu.lancementTourDeJeuJoueur(tableauJoueur[cpt]); //faire IA
+            jeu.lancementTourDeJeuJoueur(tableauJoueur[cpt]); //faire Team.IA
             System.out.println(jeu.plateau);
             gagnant = jeu.testGagnant(tableauJoueur,cpt);
         }
