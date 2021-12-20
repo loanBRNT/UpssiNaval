@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Jeu { //GENERER UNE EXCEPTION LORS DE LA SAISIE DES PLACES DES BATEAUX SI >
+public class Jeu {
     private Random random;
 
     private Plateau plateau;
