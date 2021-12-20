@@ -46,4 +46,6 @@ public abstract class Joueur {
     }
 
     public abstract int choixValeur(int borneMoins, int borneSup);
+
+    public abstract Position placementNavire(int i, int largeurPlateau, int longueurPlateau);
 }

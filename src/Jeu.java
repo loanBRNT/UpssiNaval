@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Jeu {
+public class Jeu { //GENERER UNE EXCEPTION LORS DE LA SAISIE DES PLACES DES BATEAUX SI >
     private Random random;
 
     private Plateau plateau;
@@ -66,26 +66,10 @@ public class Jeu {
      * Fonction appelant les fonctions réalisant le placement des navires pour les joueurs et l'IA.
      * L'IA joue en premier pour éviter qu'elle donne des cases déjà occupés
      */
-    public void placementNavireJoueursIA(){
-        affichagePlacementNavireIA();
-        placementNavireIA();
-        affichagePlacementNavire(j1.id);
-        placementNavireJoueur(j1);
-        affichagePlacementNavire(j2.id);
-        placementNavireJoueur(j2);
-    }
-
-    /**
-     * Permet à l'IA de placer ces bateaux
-     */
-    public void placementNavireIA(){
-        for (int i = 0 ; i < 5 ; i++){
-            try {
-                plateau.getCase(j3.placementNavire(i,plateau.LARGEUR_PLATEAU,plateau.LONGUEUR_PLATEAU)).setNavire(j3.getNavireAvecRang(i));
-            } catch (Exception e) {
-                i--;
-            }
-
+    public void placementNavireGen(Joueur[] tab){
+        for (int i = 2 ; i >= 0 ; i--){
+            affichagePlacementNavire(tab[i]);
+            placementNavireJoueur(tab[i]);
         }
     }
 
@@ -93,16 +77,15 @@ public class Jeu {
      * Permet de placer les navires du joueur passé en param
      * @param j
      */
-    public void placementNavireJoueur(JHumain j){
+    public void placementNavireJoueur(Joueur j){
         for (int i = 0 ; i < 5 ; i++){
-            System.out.println(plateau);
+            if (j.estHumain()) System.out.println(plateau);
             try {
-                plateau.getCase(j.placementNavire(i)).setNavire(j.getNavireAvecRang(i));
+                plateau.getCase(j.placementNavire(i,plateau.LARGEUR_PLATEAU,plateau.LONGUEUR_PLATEAU)).setNavire(j.getNavireAvecRang(i));
             } catch (Exception e) {
-                e.printStackTrace();
+                if (j.estHumain()) e.printStackTrace();
                 i--;
             }
-
         }
     }
 
@@ -324,20 +307,18 @@ public class Jeu {
 
     /**
      * Permet d'afficher les consignes de saisies
-     * @param x (num du joueur)
+     * @param j le joueur dont c'est le tour
      */
-    public void affichagePlacementNavire(int x){
-        System.out.println("-------------------- Placement bateaux J" + x + " -------------------------");
-        System.out.println("Veuillez suivre la procédure suivante :\nTapez numéro de ligne et numéro de colonne a la suite du nom de bateau\n(Commence à 0)");
+    public void affichagePlacementNavire(Joueur j){
+        if (j.estHumain()){
+            System.out.println("-------------------- Placement bateaux J" + j.id + " -------------------------");
+            System.out.println("Veuillez suivre la procédure suivante :\nTapez numéro de ligne et numéro de colonne a la suite du nom de bateau\n(Commence à 0)");
+        } else {
+            System.out.println("-------------------- Placement bateaux IA -------------------------");
+            System.out.println("L'ordinateur est en train de placer ses bateaux...");
+        }
     }
 
-    /**
-     * Affiche la phrase de placement des navires par l'IA.
-     */
-    public void affichagePlacementNavireIA(){
-        System.out.println("-------------------- Placement bateaux IA -------------------------");
-        System.out.println("L'ordinateur est en train de placer ses bateaux...");
-    }
 
     /**
      * Affiche la liste des navires a portee de l'attaque du navire
@@ -428,7 +409,7 @@ public class Jeu {
 
         //Placement Initial des navires
         jeu.affichageAccueil();
-        jeu.placementNavireJoueursIA();
+        jeu.placementNavireGen(tableauJoueur);
 
         //debut de tour (deplacement ou attaquer)
         while (!gagnant){

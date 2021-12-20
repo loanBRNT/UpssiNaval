@@ -8,11 +8,11 @@ public class JHumain extends Joueur{
         sc = new Scanner(System.in);
     }
 
-    public Position placementNavire(int i){
+    public Position placementNavire(int i, int largeurPlateau, int longueurPlateau){
         int x,y;
         System.out.println(equipe.listeNavire.get(i) + ": ");
-        x = sc.nextInt();
-        y = sc.nextInt();
+        x = choixValeur(0,largeurPlateau);
+        y = choixValeur(0,longueurPlateau);
         return new Position(x,y);
     }
 
