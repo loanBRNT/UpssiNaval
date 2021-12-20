@@ -3,7 +3,7 @@ import Flotte.*;
 import Statut.*;
 import Support.*;
 
-public abstract class Joueur {
+public abstract class Joueur implements IJoueur {
     public Equipe equipe;
     public int id;
 

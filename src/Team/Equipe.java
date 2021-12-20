@@ -14,6 +14,12 @@ public abstract class Equipe implements IEquipe {
     }
 
     /**
+     * Initialise l'équipe et ses différents éléments
+     * @param id lID de l'équipe a initialiser
+     */
+    public abstract void initEquipe(int id);
+
+    /**
      * Renvoie le navire au rang i de la flotte du joueur
      * @param i le rang
      * @return le navire
@@ -62,6 +68,10 @@ public abstract class Equipe implements IEquipe {
         return "Equipe " + statut + " | Sa flotte est composée de : " + listeNavire;
     }
 
+    /**
+     * Permet de renvoyer la liste des navires de la flotte
+     * @return String contenant la liste des nanvires alliés
+     */
     public String stringListeNavire(){
         String s = "";
         for (int i = 1 ; i < listeNavire.size()+1 ; i++){
