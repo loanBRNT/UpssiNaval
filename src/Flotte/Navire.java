@@ -7,6 +7,7 @@ public abstract class Navire {
     protected int PVmax;
     protected int capaciteDeplacement;
     protected int degatAtt;
+    public boolean endommage;
 
     private boolean actionJoue;
 
@@ -18,6 +19,7 @@ public abstract class Navire {
         capaciteDeplacement = 1; //Pour le moment, tous les bateaux se déplacent que d'une case
         idEquipe = _idEquipe;
         actionJoue = false;
+        endommage = false;
     }
 
     /**
@@ -49,6 +51,9 @@ public abstract class Navire {
         PV = PV + 20;
         if ( PV > PVmax) {
             PV = PVmax;
+        } if (PV > PVmax / 2){
+            endommage = false;
+            degatAtt = degatAtt*2;
         }
         System.out.println("Le " + this + " est en train de se reparer. Il a maintenant : " + PV + "PV");
     }
@@ -59,7 +64,18 @@ public abstract class Navire {
      */
     public void attaque(Navire navireCible){
         System.out.println("Le " + this + " tire sur le " + navireCible + " et lui inflige " + degatAtt + " de degats");
-        navireCible.PV = navireCible.PV - this.degatAtt;
+        navireCible.seFaitAttaquer(this.degatAtt);
+    }
+
+    /**
+     * Permet de mettre à jour le navire qui se fait attqué via le nombre de dégats qu'il subit
+     * @param degat le nombre de dégats qu'il subit
+     */
+    public void seFaitAttaquer(int degat){
+        PV = PV - degat;
+        if (PV < PVmax/2){
+            setEndommage();
+        }
     }
 
     /**
@@ -68,6 +84,15 @@ public abstract class Navire {
      */
     public boolean estUnNavireDeProfondeur(){
         return this.statutNavire == StatutNavire.SOUS_MARIN;
+    }
+
+    /**
+     * Permet de savoir si le navire est endommagé ou non
+     * @return true si le navire est considére comme endommagé, false sinon
+     */
+    public void setEndommage(){
+        if (!endommage) degatAtt = degatAtt / 2;
+        endommage = true;
     }
 
     /* ----------------- FONCTIONS STRING --------------- */
@@ -87,7 +112,12 @@ public abstract class Navire {
     }
 
     public String stringStats(){
-        return "Dégats d'attaque : " + degatAtt + "\nPoints de vie : " + PV + "\nVitesse de Déplacement :" + capaciteDeplacement;
+        return "ETAT : " + stringEtat() + "\nDégats d'attaque : " + degatAtt + "\nPoints de vie : " + PV + "\nVitesse de Déplacement :" + capaciteDeplacement;
+    }
+
+    public String stringEtat(){
+        if (endommage) return "endommage";
+        return "normal";
     }
 
     public String stringStatsCible(){
