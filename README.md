@@ -107,3 +107,6 @@ ETAT : un navire est endommagé s'il a moins de la moitié de ses PV. Un navire 
 
 - Ajouter une capacité de déplacement variable selon les navires.
 - Augmenter l'impact de l'état "endommagé" en réduisant les capacités de déplacement.
+- Detecter un gagnant même si le tour du joueur n'est pas encore terminé (améliore la fluidité)
+- Ne plus afficher le tour d'un joueur s'il n'a plus de navire dans sa flotte
+- Permettre à l'ordinateur de ne plus jouer simplement aléatoirement
